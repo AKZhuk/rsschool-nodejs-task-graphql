@@ -1,5 +1,16 @@
 import { Type } from '@fastify/type-provider-typebox';
-import { buildSchema } from 'graphql'
+import { GraphQLSchema } from 'graphql'
+import { PrismaClient } from '@prisma/client';
+import { GraphQLObjectType } from "graphql";
+import { post, posts } from "./fields/post.js";
+import { profile, profiles } from "./fields/profile.js";
+import { memberType, memberTypes } from "./fields/memberType.js";
+import { changeUser, createUser, deleteUser, user, users } from "./fields/user.js";
+import { changePost, createPost, deletePost } from "./fields/post.js";
+import { changeProfile, createProfile, deleteProfile } from "./fields/profile.js";
+import { subscribeTo, unsubscribeFrom } from './fields/subscribe.js';
+import DataLoader from 'dataloader';
+
 
 export const gqlResponseSchema = Type.Partial(
   Type.Object({
@@ -7,7 +18,6 @@ export const gqlResponseSchema = Type.Partial(
     errors: Type.Any(),
   }),
 );
-
 export const createGqlResponseSchema = {
   body: Type.Object(
     {
@@ -20,43 +30,43 @@ export const createGqlResponseSchema = {
   ),
 };
 
-const schemaString = `
-  scalar UUID
-  scalar MemberTypeId
-  type MemberType {
-    id: MemberTypeId!
-    discount: Float
-    postsLimitPerMonth: Float
-  }
-  type Post {
-    id: UUID!
-    title: String!
-    content: String!
-  }
-  type Profile {
-    id: UUID!
-    isMale: Boolean!
-    yearOfBirth: Int!
-    memberType: MemberType
-  }
-   type User {
-    id: UUID!
-    name: String!
-    balance: Float!
-    profile: Profile
-    posts: [Post]
-  }
-  type Query {
-    memberTypes: [MemberType]
-    posts: [Post]
-    users: [User]
-    profiles: [Profile]
-    user(id: UUID!): User
-    memberType(id: MemberTypeId!): MemberType
-    post(id: UUID!): Post
-    profile(id: UUID!): Profile
-  }
-`;
+export interface Context {
+  db: PrismaClient,
+  userSubscribedToCache: DataLoader<string, unknown>
+  subscribedToUserCache: DataLoader<string, unknown>
+}
 
 
-export const schema = buildSchema(schemaString);
+
+export const QueryType = new GraphQLObjectType({
+  name: 'Query',
+  fields: () => ({
+    memberType,
+    memberTypes,
+    post,
+    posts,
+    user,
+    users,
+    profile,
+    profiles,
+  }),
+});
+
+export const MutationType = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: () => ({
+    changePost: changePost,
+    createPost: createPost,
+    deletePost: deletePost,
+    changeProfile,
+    createProfile,
+    deleteProfile,
+    changeUser,
+    createUser,
+    deleteUser,
+    subscribeTo,
+    unsubscribeFrom
+  }),
+});
+
+export const schema = new GraphQLSchema({ query: QueryType, mutation: MutationType });
