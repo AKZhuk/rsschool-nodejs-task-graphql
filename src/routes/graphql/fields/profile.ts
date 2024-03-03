@@ -18,7 +18,6 @@ export const profiles: GraphQLFieldConfig<void, Context, void> = {
   resolve: (_src, _, { db }) => db.profile.findMany(),
 };
 
-
 const ChangeProfileInputType = new GraphQLInputObjectType({
   name: 'ChangeProfileInput',
   fields: () => ({
@@ -38,7 +37,6 @@ export const changeProfile: GraphQLFieldConfig<void, Context, ChangeArgs<Profile
     db.profile.update({ where: { id: args.id }, data: args.dto }),
 };
 
-
 const CreateProfileInputType = new GraphQLInputObjectType({
   name: 'CreateProfileInput',
   fields: () => ({
@@ -48,8 +46,6 @@ const CreateProfileInputType = new GraphQLInputObjectType({
     isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
   }),
 });
-
-
 
 export const createProfile: GraphQLFieldConfig<void, Context, CreateArgs<Profile>> = {
   type: ProfileType,
