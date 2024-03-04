@@ -1,4 +1,16 @@
 import { Type } from '@fastify/type-provider-typebox';
+import { GraphQLSchema } from 'graphql'
+import { PrismaClient } from '@prisma/client';
+import { GraphQLObjectType } from "graphql";
+import { post, posts } from "./fields/post.js";
+import { profile, profiles } from "./fields/profile.js";
+import { memberType, memberTypes } from "./fields/memberType.js";
+import { changeUser, createUser, deleteUser, user, users } from "./fields/user.js";
+import { changePost, createPost, deletePost } from "./fields/post.js";
+import { changeProfile, createProfile, deleteProfile } from "./fields/profile.js";
+import { subscribeTo, unsubscribeFrom } from './fields/subscribe.js';
+import DataLoader from 'dataloader';
+
 
 export const gqlResponseSchema = Type.Partial(
   Type.Object({
@@ -6,7 +18,6 @@ export const gqlResponseSchema = Type.Partial(
     errors: Type.Any(),
   }),
 );
-
 export const createGqlResponseSchema = {
   body: Type.Object(
     {
@@ -18,3 +29,49 @@ export const createGqlResponseSchema = {
     },
   ),
 };
+
+export interface Context {
+  db: PrismaClient,
+  cache: {
+    userSubscribedTo: DataLoader<string, unknown>
+    subscribedToUser: DataLoader<string, unknown>
+    posts: DataLoader<string, unknown>,
+    profile: DataLoader<string, unknown>
+    memberType: DataLoader<string, unknown>
+  }
+}
+
+
+
+export const QueryType = new GraphQLObjectType({
+  name: 'Query',
+  fields: () => ({
+    memberType,
+    memberTypes,
+    post,
+    posts,
+    user,
+    users,
+    profile,
+    profiles,
+  }),
+});
+
+export const MutationType = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: () => ({
+    changePost: changePost,
+    createPost: createPost,
+    deletePost: deletePost,
+    changeProfile,
+    createProfile,
+    deleteProfile,
+    changeUser,
+    createUser,
+    deleteUser,
+    subscribeTo,
+    unsubscribeFrom
+  }),
+});
+
+export const schema = new GraphQLSchema({ query: QueryType, mutation: MutationType });
