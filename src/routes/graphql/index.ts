@@ -28,7 +28,14 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         source: query,
         variableValues: variables,
         contextValue: {
-          db: fastify.prisma
+          db: fastify.prisma,
+          cache: {
+            userSubscribedTo: null,
+            subscribedToUser: null,
+            posts: null,
+            profile: null,
+            memberType: null,
+          }
         }
       });
 

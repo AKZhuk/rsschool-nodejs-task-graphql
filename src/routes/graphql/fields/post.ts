@@ -35,8 +35,8 @@ export const changePost: GraphQLFieldConfig<void, Context, ChangeArgs<Post>> = {
     id: { type: new GraphQLNonNull(UUIDType) },
     dto: { type: new GraphQLNonNull(ChangePostInputType) },
   },
-  resolve: (_src, args, { db }) =>
-    db.post.update({ where: { id: args.id }, data: args.dto }),
+  resolve: (_, { dto, id }, { db }) =>
+    db.post.update({ where: { id: id }, data: dto }),
 };
 
 
@@ -52,13 +52,13 @@ const CreatePostInputType = new GraphQLInputObjectType({
 export const createPost: GraphQLFieldConfig<void, Context, CreateArgs<Post>> = {
   type: PostType,
   args: { dto: { type: new GraphQLNonNull(CreatePostInputType) } },
-  resolve: (_src, args, { db }) => db.post.create({ data: args.dto }),
+  resolve: (_, { dto }, { db }) => db.post.create({ data: dto }),
 };
 
 export const deletePost: GraphQLFieldConfig<void, Context, ArgsId> = {
   type: new GraphQLNonNull(UUIDType),
   args: { id: { type: new GraphQLNonNull(UUIDType) } },
-  resolve: async (_src, { id }, { db }) => {
+  resolve: async (_, { id }, { db }) => {
     const post = await db.post.delete({ where: { id: id } });
     return post.id;
   },
