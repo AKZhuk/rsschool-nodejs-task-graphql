@@ -1,8 +1,8 @@
 import { GraphQLScalarType, Kind } from "graphql";
 
 enum MemberTypes {
-  basic,
-  business
+  basic = "basic",
+  business = "business"
 }
 
 const ErrorMessage = "Invalid MemberTypeId"
