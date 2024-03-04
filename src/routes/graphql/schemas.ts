@@ -32,8 +32,13 @@ export const createGqlResponseSchema = {
 
 export interface Context {
   db: PrismaClient,
-  userSubscribedToCache: DataLoader<string, unknown>
-  subscribedToUserCache: DataLoader<string, unknown>
+  cache: {
+    userSubscribedTo: DataLoader<string, unknown>
+    subscribedToUser: DataLoader<string, unknown>
+    posts: DataLoader<string, unknown>,
+    profile: DataLoader<string, unknown>
+    memberType: DataLoader<string, unknown>
+  }
 }
 
 
